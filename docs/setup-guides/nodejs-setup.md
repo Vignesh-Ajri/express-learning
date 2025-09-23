@@ -131,4 +131,4 @@ Replace `express` with any other package you need.
 
 For more detailed information and advanced configurations, refer to the official Node.js documentation:
 
-👉 [Node.js Documentation](https://nodejs.org/en/docs/)
+[Node.js Documentation](https://nodejs.org/en/docs/)
