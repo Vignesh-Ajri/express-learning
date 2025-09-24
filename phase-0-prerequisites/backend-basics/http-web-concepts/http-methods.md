@@ -92,7 +92,3 @@ HTTP defines a set of request methods that indicate the desired action to be per
 
 - Establishes a tunnel to the server.
 - Commonly used for HTTPS.
-
----
-
-**Visual Aid:** [HTTP Methods and CRUD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)

@@ -44,7 +44,3 @@ HTTP status codes are **three-digit numbers** returned by a server to indicate t
 - `502 Bad Gateway` → Invalid response from upstream.
 - `503 Service Unavailable` → Server overloaded or down.
 - `504 Gateway Timeout` → No timely response.
-
----
-
-**Visual Aid:** ![Status Code Categories](https://i.imgur.com/2fSEutR.png)
