@@ -1,4 +1,4 @@
-## HTTP Methods (Verbs)
+## HTTP Methods
 
 HTTP defines a set of request methods that indicate the desired action to be performed for a given resource. These are often called **HTTP verbs**. Each method has specific semantics, and understanding them is crucial for designing APIs and web applications.
 
