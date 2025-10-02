@@ -1,0 +1,61 @@
+[
+  {
+    "_id": 1,
+    "name": "Alice",
+    "age": 25,
+    "skills": ["Python", "MongoDB"],
+    "address": {
+      "city": "Bangalore",
+      "pincode": 560001
+    }
+  },
+  {
+    "_id": 2,
+    "name": "Bob",
+    "age": 30,
+    "skills": ["Java", "SQL"],
+    "address": {
+      "city": "Delhi",
+      "pincode": 110001
+    },
+    "projects": [
+      { "title": "E-Commerce", "status": "Completed" },
+      { "title": "Banking App", "status": "Ongoing" }
+    ]
+  },
+  {
+    "_id": 3,
+    "name": "Charlie",
+    "age": 28,
+    "skills": ["React", "Node.js"],
+    "address": {
+      "city": "Mumbai",
+      "pincode": 400001
+    },
+    "orders": [
+      { "order_id": 101, "amount": 2500, "status": "Delivered" },
+      { "order_id": 102, "amount": 1800, "status": "Pending" }
+    ]
+  },
+  {
+    "_id": 4,
+    "name": "Diana",
+    "age": 35,
+    "skills": ["AWS", "DevOps"],
+    "certifications": [
+      { "name": "AWS Solutions Architect", "year": 2021 },
+      { "name": "Docker Certified", "year": 2022 }
+    ]
+  },
+  {
+    "_id": 5,
+    "name": "Ethan",
+    "age": null,
+    "skills": [],
+    "address": {
+      "city": null,
+      "pincode": null
+    },
+    "notes": "This user profile is incomplete"
+  }
+]
