@@ -1,4 +1,4 @@
-# 📘 MongoDB Basics (NoSQL Concepts)
+# MongoDB Basics (NoSQL Concepts)
 
 ## 1. What is NoSQL?
 
