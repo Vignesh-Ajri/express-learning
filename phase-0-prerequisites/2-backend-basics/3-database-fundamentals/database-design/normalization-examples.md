@@ -133,3 +133,13 @@ Address(AddressID, Street, City, State)
 
 ---
 
+# Summary Table
+
+| Normal Form | Removes…                          | Example Fix                               |
+| ----------- | --------------------------------- | ----------------------------------------- |
+| **1NF**     | Repeating groups, non-atomic data | Split multi-valued columns                |
+| **2NF**     | Partial dependency                | Separate product info from order          |
+| **3NF**     | Transitive dependency             | Separate department from employee         |
+| **BCNF**    | Non-key determinants              | Ensure every determinant is candidate key |
+| **4NF**     | Multi-valued dependency           | Separate skills & languages               |
+| **5NF**     | Join dependency                   | Break into minimal relations              |
