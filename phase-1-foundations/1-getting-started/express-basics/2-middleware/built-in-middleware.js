@@ -8,6 +8,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // Built-in middleware to parse JSON body
 app.use(express.json());
 
+// Parse URL-encoded form data
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (req, res) => {
   res.send("Built-in middleware example");
 });
