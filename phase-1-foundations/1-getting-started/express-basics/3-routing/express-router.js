@@ -1,6 +1,12 @@
 const express = require("express");
 const app = express();
 
+const userRoutes = require("./routes/users");
+const postRoutes = require("./routes/posts");
+
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
+
 // Basic routes
 app.get("/", (req, res) => {
   res.send("Welcome to Home Page!");
