@@ -11,7 +11,7 @@ package.json
 package-lock.json
 dist/
 
-# Java (Spring Boot later)
+# Java (Spring Boot)
 target/
 *.class
 *.jar
