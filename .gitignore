@@ -11,13 +11,5 @@ package.json
 package-lock.json
 dist/
 
-# Java (Spring Boot)
-target/
-*.class
-*.jar
-*.war
-*.iml
-.idea/
-
 # Env
 .env
