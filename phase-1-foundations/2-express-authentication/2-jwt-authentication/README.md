@@ -1,4 +1,4 @@
-# Day 2 — JWT Authentication
+# JWT Authentication
 
 ## 🔑 Key Concepts
 - JSON Web Tokens (JWT)

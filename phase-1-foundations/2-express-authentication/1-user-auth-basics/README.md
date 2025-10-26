@@ -1,4 +1,4 @@
-# Day 1 — User Authentication Basics
+# User Authentication Basics
 
 ## 🔍 Concepts
 - Authentication vs Authorization
