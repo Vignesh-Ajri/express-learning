@@ -13,5 +13,5 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.get("/", (req, res) => res.send("✅ Secure API running!"));
+app.get("/", (req, res) => res.send("Secure API running!"));
 app.listen(5000, () => console.log("Server secure with Helmet & Rate Limit"));
