@@ -10,7 +10,7 @@ console.log("Generated Token:", token);
 setTimeout(() => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("✅ Verified Token:", decoded);
+    console.log("Verified Token:", decoded);
   } catch (err) {
     console.log("❌ Token expired or invalid:", err.message);
   }

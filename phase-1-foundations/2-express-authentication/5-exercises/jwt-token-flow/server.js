@@ -26,4 +26,4 @@ app.get("/verify", (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("🔐 JWT Demo running on port 5000"));
+app.listen(5000, () => console.log("JWT Demo running on port 5000"));
