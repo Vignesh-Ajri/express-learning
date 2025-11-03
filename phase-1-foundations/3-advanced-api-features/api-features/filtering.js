@@ -1,16 +1,16 @@
 exports.filterUsers = async (req, res, next, Model) => {
   try {
-    // 1️⃣ Make a copy of the query object
+    // 1️ Make a copy of the query object
     const queryObj = { ...req.query };
 
-    // 2️⃣ Remove fields that are not filters (e.g. sort, page, etc.)
+    // 2️ Remove fields that are not filters (e.g. sort, page, etc.)
     const excludeFields = ["sort", "limit", "page", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    // 3️⃣ Build the query
+    // 3️ Build the query
     let query = Model.find(queryObj);
 
-    // 4️⃣ Execute
+    // 4️ Execute
     const docs = await query;
 
     res.status(200).json({
