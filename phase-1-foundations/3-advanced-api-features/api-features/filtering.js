@@ -1,16 +1,23 @@
 exports.filterUsers = async (req, res, next, Model) => {
   try {
-    // 1️ Make a copy of the query object
+    // 1️ Copy query
     const queryObj = { ...req.query };
 
-    // 2️ Remove fields that are not filters (e.g. sort, page, etc.)
+    // 2️ Exclude non-filter fields
     const excludeFields = ["sort", "limit", "page", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    // 3️ Build the query
-    let query = Model.find(queryObj);
+    // 3️ Advanced filtering (gte, gt, lte, lt)
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
 
-    // 4️ Execute
+    // 4️ Convert back to object and query
+    let query = Model.find(JSON.parse(queryStr));
+
+    // 5️ Execute query
     const docs = await query;
 
     res.status(200).json({
