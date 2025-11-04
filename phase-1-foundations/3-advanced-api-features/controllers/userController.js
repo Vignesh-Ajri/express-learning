@@ -1,31 +1,15 @@
-const User = require("../models/Users");
+const User = require("../models/User");
 const { filterUsers } = require("../api-features/filtering");
+const { sortResults } = require("../api-features/sorting");
 
-// @desc    Get all users
+// @desc    Get all users (filtering + sorting)
 // @route   GET /api/v1/users
 // @access  Public
 exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-
-    res.status(200).json({
-      status: "success",
-      results: users.length,
-      data: {
-        users,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message,
-    });
+  // 🧩 Choose feature based on query
+  if (req.query.sort) {
+    await sortResults(req, res, User);
+  } else {
+    await filterUsers(req, res, null, User);
   }
-};
-
-// @desc    Get all users (with filtering support)
-// @route   GET /api/v1/users
-// @access  Public
-exports.getAllUsers = async (req, res) => {
-  await filterUsers(req, res, null, User);
 };
