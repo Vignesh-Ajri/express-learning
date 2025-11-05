@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/Users");
 const { filterUsers } = require("../api-features/filtering");
 const { sortResults } = require("../api-features/sorting");
 const { limitFields } = require("../api-features/field-limiting");
