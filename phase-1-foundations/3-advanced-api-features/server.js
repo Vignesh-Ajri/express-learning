@@ -8,6 +8,8 @@ const { applyRateLimit } = require("./performance/rate-limit");
 const { preventHpp } = require("./performance/hpp");
 const { enableCompression } = require("./performance/compression");
 const { logQueryTime } = require("./performance/optimization");
+const { loadEnv } = require("./security/dotenv-config");
+loadEnv();
 
 dotenv.config();
 connectDB();
