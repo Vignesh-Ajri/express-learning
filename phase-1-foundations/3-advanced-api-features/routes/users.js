@@ -8,7 +8,7 @@ const nestedPostRoutes = require("../nested-population/nested-routes");
 router.get("/", userController.getAllUsers);
 router.get("/stats", getUserStats);
 
-// Nested route: /api/v1/users/:userId/posts
+// Nested route: /api/users/:userId/posts
 router.use("/:userId/posts", nestedPostRoutes);
 
 module.exports = router;

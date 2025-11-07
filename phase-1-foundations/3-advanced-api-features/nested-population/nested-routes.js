@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const Post = require("../models/Post");
 
-// GET /api/v1/users/:userId/posts → Fetch posts by user
+// GET /api/users/:userId/posts → Fetch posts by user
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find({ user: req.params.userId })
