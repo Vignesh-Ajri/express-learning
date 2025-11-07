@@ -1,18 +1,21 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true }); // Important for nested routes
+const router = express.Router({ mergeParams: true });
 const Post = require("../models/Post");
 
-// /api/v1/users/:userId/posts
+// GET /api/v1/users/:userId/posts → Fetch posts by user
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find({ user: req.params.userId });
-    res.json({
+    const posts = await Post.find({ user: req.params.userId })
+      .populate("user", "name email")
+      .sort("-createdAt");
+
+    res.status(200).json({
       status: "success",
-      count: posts.length,
-      data: posts
+      results: posts.length,
+      data: { posts },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 });
 
