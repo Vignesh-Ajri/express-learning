@@ -1,23 +1,21 @@
 const express = require('express')
 const dotenv = require('dotenv');
-
 const connectDB = require('./config/database');
-
 const { setSecurityHeaders } = require("./performance/helmet");
 const { applyRateLimit } = require("./performance/rate-limit");
 const { preventHpp } = require("./performance/hpp");
 const { enableCompression } = require("./performance/compression");
 const { logQueryTime } = require("./performance/optimization");
 const { loadEnv } = require("./security/dotenv-config");
-loadEnv();
 
 const { setupVersioning } = require("./versioning/api-versioning");
-setupVersioning(app);
 
+loadEnv();
 dotenv.config();
 connectDB();
 
-const app = express()
+const app = express();
+setupVersioning(app);
 
 // Middleware
 app.use(express.json());
@@ -29,7 +27,10 @@ enableCompression(app);
 
 // Routes
 const userRoutes = require("./routes/users");
-app.use("/api/v1/users", userRoutes);
+app.use("/api/users", userRoutes);
+
+const postRoutes = require("./routes/posts");
+app.use("/api/posts", postRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running successfully");
@@ -38,5 +39,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT,()=>{
-    console.log(`server is running on http://localhost:${PORT}`)
+    console.log(`server is running on http://localhost:${PORT}`);
 })
