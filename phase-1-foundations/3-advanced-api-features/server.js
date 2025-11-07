@@ -11,6 +11,9 @@ const { logQueryTime } = require("./performance/optimization");
 const { loadEnv } = require("./security/dotenv-config");
 loadEnv();
 
+const { setupVersioning } = require("./versioning/api-versioning");
+setupVersioning(app);
+
 dotenv.config();
 connectDB();
 
