@@ -5,9 +5,9 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
 // Import routes
-const authRoutes = require('./routes/authRoutes');
-const tasksRoutes = require('./routes/tasksRoutes');
-const categoriesRoutes = require('./routes/categoriesRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const tasksRoutes = require('./src/routes/tasksRoutes');
+const categoriesRoutes = require('./src/routes/categoriesRoutes');
 
 dotenv.config();
 connectDB();
