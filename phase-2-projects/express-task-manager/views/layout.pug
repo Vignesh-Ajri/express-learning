@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Task Manager
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    nav.navbar
+      ul
+        li: a(href="/") Home
+        li: a(href="/tasks") Tasks
+        li: a(href="/categories") Categories
+        li: a(href="/dashboard") Dashboard
+        li: a#logout-btn(href="#") Logout
+
+    block content
+
+    script(src="/js/app.js")
