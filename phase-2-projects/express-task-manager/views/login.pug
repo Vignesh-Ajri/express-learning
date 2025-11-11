@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  .form-container
+    h2 Login
+    form#login-form
+      label(for="email") Email
+      input#email(type="email" required)
+      label(for="password") Password
+      input#password(type="password" required)
+      button(type="submit") Login
+    p
+      | Don’t have an account?
+      a(href="/register") Register here
