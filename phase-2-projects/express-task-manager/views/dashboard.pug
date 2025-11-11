@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  .dashboard
+    h2 Dashboard
+    p Welcome, #[span#user-name]!
+    .stats
+      p Total Tasks: #[span#total-tasks]
+      p Completed: #[span#completed-tasks]
+      p Pending: #[span#pending-tasks]
+    .links
+      a.button(href="/tasks") View Tasks
+      a.button(href="/categories") View Categories
