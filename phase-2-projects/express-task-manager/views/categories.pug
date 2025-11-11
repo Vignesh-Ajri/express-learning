@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .categories-page
+    h2 Categories
+    form#category-form
+      input#categoryName(type="text" placeholder="Add Category" required)
+      button(type="submit") Add
+
+    ul#category-list
