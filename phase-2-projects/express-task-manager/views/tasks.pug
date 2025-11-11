@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .tasks-page
+    h2 Tasks
+    form#task-form
+      input#title(type="text" placeholder="Title" required)
+      textarea#description(placeholder="Description")
+      input#dueDate(type="date" required)
+      select#category
+        option(value="") Select Category
+      button(type="submit") Add Task
+
+    table
+      thead
+        tr
+          th Title
+          th Status
+          th Category
+          th Actions
+      tbody#task-list
