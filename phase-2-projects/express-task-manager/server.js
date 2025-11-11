@@ -9,6 +9,7 @@ const connectDB = require('./config/database');
 const authRoutes = require('./src/routes/authRoutes');
 const tasksRoutes = require('./src/routes/tasksRoutes');
 const categoriesRoutes = require('./src/routes/categoriesRoutes');
+const viewRoutes = require("./src/routes/viewRoutes");
 
 dotenv.config();
 connectDB();
@@ -32,6 +33,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/auth",authRoutes);
 app.use("/api/tasks",tasksRoutes);
 app.use("/api/categories",categoriesRoutes);
+
+// Frontend (View) Routes
+app.use("/", viewRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running successfully");
