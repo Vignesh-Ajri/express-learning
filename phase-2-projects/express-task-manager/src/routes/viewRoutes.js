@@ -8,7 +8,7 @@ router.get("/login", (req, res) => res.render("login"));
 router.get("/register", (req, res) => res.render("register"));
 
 // Protected Pages
-router.get("/dashboard", protect, (req, res) => res.render("dashboard"));
+router.get("/me", (req, res) => res.render("dashboard"));
 router.get("/tasks", protect, (req, res) => res.render("tasks"));
 router.get("/categories", protect, (req, res) => res.render("categories"));
 
