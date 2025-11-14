@@ -1,68 +1,51 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const morgan = require('morgan')
+const morgan = require('morgan');
 const dotenv = require('dotenv');
-const connectDB = require('./config/database');
+const connectDB = require('./src/config/database');
 
-// Import routes
-const authRoutes = require('./src/routes/authRoutes');
-const tasksRoutes = require('./src/routes/tasksRoutes');
-const categoriesRoutes = require('./src/routes/categoriesRoutes');
-const viewRoutes = require("./src/routes/viewRoutes");
-
+// Load environment variables
 dotenv.config();
+
+// Connect to database
 connectDB();
 
+// Initialize Express
 const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: true }));
 
-// View Engine Setup
-app.set("view engine", "pug");
-app.set("views", path.join(__dirname, "views"));
+// View engine setup
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
-// Serve Static Files
-app.use(express.static(path.join(__dirname, "public")));
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.use("/api/auth",authRoutes);
-app.use("/api/tasks",tasksRoutes);
-app.use("/api/categories",categoriesRoutes);
+// API Routes
+app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/tasks', require('./src/routes/taskRoutes'));
+app.use('/api/categories', require('./src/routes/categoryRoutes'));
 
-// Frontend (View) Routes
-app.use("/", viewRoutes);
+// View Routes
+app.use('/', require('./src/routes/viewRoutes'));
 
-app.get("/", (req, res) => {
-  res.send("API is running successfully");
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Handle undefined routes (404)
-app.all('*', (req, res, next) => {
-  const error = new Error(`Cannot find ${req.originalUrl} on this server!`);
-  error.statusCode = 404;
-  next(error);
+// Global Error Handler (using the errorHandler middleware)
+const errorHandler = require('./src/middleware/errorHandler');
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-
-// Global Error Handling Middleware
-app.use((err, req, res, next) => {
-  console.error('ERROR:', err);
-
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
-
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT,()=>{
-    console.log(`server is running on http://localhost:${PORT}`);
-})

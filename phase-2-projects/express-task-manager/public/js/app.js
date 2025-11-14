@@ -1,128 +1,195 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const token = localStorage.getItem("token");
-  const logoutBtn = document.getElementById("logout-btn");
+document.addEventListener('DOMContentLoaded', () => {
+  const API_BASE = 'http://localhost:5000';
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    });
-  }
+  // Helper function for API requests
+  async function apiRequest(url, method = 'GET', data = null) {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
 
-  // Helper
-  async function apiRequest(url, method = "GET", data = null) {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    };
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: data ? JSON.stringify(data) : null,
-    });
-    return res.json();
-  }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-  // Login
-  const loginForm = document.getElementById("login-form");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const res = await apiRequest("/api/auth/login", "POST", { email, password });
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        window.location.href = "/dashboard";
-      } else alert(res.message || "Login failed");
-    });
-  }
+      const options = {
+        method,
+        headers
+      };
 
-  // Register
-  const registerForm = document.getElementById("register-form");
-  if (registerForm) {
-    registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-      if (password !== confirmPassword) return alert("Passwords do not match!");
-      const res = await apiRequest("/api/auth/register", "POST", { name, email, password });
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        window.location.href = "/dashboard";
-      } else alert(res.message || "Registration failed");
-    });
-  }
+      if (data) {
+        options.body = JSON.stringify(data);
+      }
 
-  // Dashboard
-  if (window.location.pathname === "/dashboard") {
-    apiRequest("/api/auth/me").then((res) => {
-      if (!res.name) return (window.location.href = "/login");
-      document.getElementById("user-name").textContent = res.name;
-      document.getElementById("total-tasks").textContent = res.stats?.total || 0;
-      document.getElementById("completed-tasks").textContent = res.stats?.completed || 0;
-      document.getElementById("pending-tasks").textContent = res.stats?.pending || 0;
-    });
-  }
+      const response = await fetch(`${API_BASE}${url}`, options);
+      const result = await response.json();
 
-  // Tasks
-  if (window.location.pathname === "/tasks") {
-    const taskForm = document.getElementById("task-form");
-    const taskList = document.getElementById("task-list");
-    const categoryDropdown = document.getElementById("category");
+      if (!response.ok) {
+        throw new Error(result.message || 'Request failed');
+      }
 
-    async function loadTasks() {
-      const tasks = await apiRequest("/api/tasks");
-      taskList.innerHTML = "";
-      tasks.forEach((t) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${t.title}</td>
-          <td>${t.status}</td>
-          <td>${t.category?.name || "N/A"}</td>
-          <td>
-            <button class="complete-btn" data-id="${t._id}">✔</button>
-            <button class="delete-btn" data-id="${t._id}">🗑</button>
-          </td>`;
-        taskList.appendChild(row);
-      });
+      return result;
+    } catch (error) {
+      console.error('API Error:', error);
+      alert(error.message);
+      return null;
     }
+  }
+
+  // Logout functionality
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    });
+  }
+
+  // Register page
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        return alert('Passwords do not match!');
+      }
+
+      const result = await apiRequest('/api/auth/register', 'POST', { name, email, password });
+      
+      if (result && result.success) {
+        localStorage.setItem('token', result.data.token);
+        window.location.href = '/dashboard';
+      }
+    });
+  }
+
+  // Login page
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const result = await apiRequest('/api/auth/login', 'POST', { email, password });
+      
+      if (result && result.success) {
+        localStorage.setItem('token', result.data.token);
+        window.location.href = '/dashboard';
+      }
+    });
+  }
+
+  // Dashboard page
+  if (window.location.pathname === '/dashboard') {
+    async function loadDashboard() {
+      const result = await apiRequest('/api/auth/me');
+      
+      if (!result || !result.success) {
+        return window.location.href = '/login';
+      }
+
+      document.getElementById('user-name').textContent = result.data.user.name;
+
+      // Load tasks for stats
+      const tasksResult = await apiRequest('/api/tasks');
+      if (tasksResult && tasksResult.success) {
+        const tasks = tasksResult.data;
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.status === 'completed').length;
+        const pending = tasks.filter(t => t.status === 'pending').length;
+
+        document.getElementById('total-tasks').textContent = total;
+        document.getElementById('completed-tasks').textContent = completed;
+        document.getElementById('pending-tasks').textContent = pending;
+      }
+    }
+    
+    loadDashboard();
+  }
+
+  // Tasks page
+  if (window.location.pathname === '/tasks') {
+    const taskForm = document.getElementById('task-form');
+    const taskList = document.getElementById('task-list');
+    const categoryDropdown = document.getElementById('category');
 
     async function loadCategories() {
-      const cats = await apiRequest("/api/categories");
-      cats.forEach((c) => {
-        const opt = document.createElement("option");
-        opt.value = c._id;
-        opt.textContent = c.name;
-        categoryDropdown.appendChild(opt);
-      });
+      const result = await apiRequest('/api/categories');
+      if (result && result.success) {
+        categoryDropdown.innerHTML = 'No Category';
+        result.data.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat._id;
+          option.textContent = cat.name;
+          categoryDropdown.appendChild(option);
+        });
+      }
+    }
+
+    async function loadTasks() {
+      const result = await apiRequest('/api/tasks');
+      if (result && result.success) {
+        taskList.innerHTML = '';
+        result.data.forEach(task => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            ${task.title}
+            ${task.status}
+            ${task.category ? task.category.name : 'N/A'}
+            
+              ✓ Complete
+              🗑 Delete
+            
+          `;
+          taskList.appendChild(row);
+        });
+      }
     }
 
     if (taskForm) {
-      taskForm.addEventListener("submit", async (e) => {
+      taskForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const data = {
-          title: document.getElementById("title").value,
-          description: document.getElementById("description").value,
-          dueDate: document.getElementById("dueDate").value,
-          category: document.getElementById("category").value,
-        };
-        await apiRequest("/api/tasks", "POST", data);
-        taskForm.reset();
-        loadTasks();
+        
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const dueDate = document.getElementById('dueDate').value;
+        const category = document.getElementById('category').value;
+
+        const data = { title, description, dueDate };
+        if (category) data.category = category;
+
+        const result = await apiRequest('/api/tasks', 'POST', data);
+        
+        if (result && result.success) {
+          taskForm.reset();
+          loadTasks();
+        }
       });
     }
 
-    taskList.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("delete-btn")) {
-        await apiRequest(`/api/tasks/${e.target.dataset.id}`, "DELETE");
-        loadTasks();
-      } else if (e.target.classList.contains("complete-btn")) {
-        await apiRequest(`/api/tasks/${e.target.dataset.id}`, "PATCH", { status: "completed" });
-        loadTasks();
+    taskList.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        const taskId = e.target.dataset.id;
+        const result = await apiRequest(`/api/tasks/${taskId}`, 'DELETE');
+        if (result && result.success) {
+          loadTasks();
+        }
+      } else if (e.target.classList.contains('complete-btn')) {
+        const taskId = e.target.dataset.id;
+        const result = await apiRequest(`/api/tasks/${taskId}`, 'PUT', { status: 'completed' });
+        if (result && result.success) {
+          loadTasks();
+        }
       }
     });
 
@@ -130,35 +197,47 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTasks();
   }
 
-  // Categories
-  if (window.location.pathname === "/categories") {
-    const catForm = document.getElementById("category-form");
-    const catList = document.getElementById("category-list");
+  // Categories page
+  if (window.location.pathname === '/categories') {
+    const categoryForm = document.getElementById('category-form');
+    const categoryList = document.getElementById('category-list');
 
     async function loadCategories() {
-      const cats = await apiRequest("/api/categories");
-      catList.innerHTML = "";
-      cats.forEach((c) => {
-        const li = document.createElement("li");
-        li.innerHTML = `${c.name} <button data-id="${c._id}" class="delete-cat">❌</button>`;
-        catList.appendChild(li);
-      });
+      const result = await apiRequest('/api/categories');
+      if (result && result.success) {
+        categoryList.innerHTML = '';
+        result.data.forEach(cat => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            ${cat.name}
+            ✕ Delete
+          `;
+          categoryList.appendChild(li);
+        });
+      }
     }
 
-    if (catForm) {
-      catForm.addEventListener("submit", async (e) => {
+    if (categoryForm) {
+      categoryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById("categoryName").value;
-        await apiRequest("/api/categories", "POST", { name });
-        catForm.reset();
-        loadCategories();
+        
+        const name = document.getElementById('categoryName').value;
+        const result = await apiRequest('/api/categories', 'POST', { name });
+        
+        if (result && result.success) {
+          categoryForm.reset();
+          loadCategories();
+        }
       });
     }
 
-    catList.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("delete-cat")) {
-        await apiRequest(`/api/categories/${e.target.dataset.id}`, "DELETE");
-        loadCategories();
+    categoryList.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('delete-cat')) {
+        const catId = e.target.dataset.id;
+        const result = await apiRequest(`/api/categories/${catId}`, 'DELETE');
+        if (result && result.success) {
+          loadCategories();
+        }
       }
     });
 
