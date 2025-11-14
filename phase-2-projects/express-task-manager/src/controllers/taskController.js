@@ -7,20 +7,32 @@ const createTask = async (req, res, next) => {
     const { title, description, dueDate, status, category } = req.body;
 
     if (!title) {
-      return res.status(400).json({ success: false, message: 'Title is required' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Task title is required' 
+      });
     }
 
-    // Optional: validate category belongs to user
+    // Validate category if provided
     if (category) {
-      const cat = await Category.findOne({ _id: category, createdBy: req.user._id });
-      if (!cat) return res.status(400).json({ success: false, message: 'Invalid category' });
+      const categoryExists = await Category.findOne({ 
+        _id: category, 
+        createdBy: req.user._id 
+      });
+      
+      if (!categoryExists) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid category' 
+        });
+      }
     }
 
     const task = await Task.create({
       title,
       description,
       dueDate,
-      status,
+      status: status || 'pending',
       category,
       createdBy: req.user._id
     });
@@ -31,13 +43,15 @@ const createTask = async (req, res, next) => {
   }
 };
 
-// Get all tasks by user (with optional category filter)
+// Get all tasks
 const getTasks = async (req, res, next) => {
   try {
-    const { category } = req.query;
+    const { category, status } = req.query;
 
     const filter = { createdBy: req.user._id };
+    
     if (category) filter.category = category;
+    if (status) filter.status = status;
 
     const tasks = await Task.find(filter)
       .populate('category', 'name')
@@ -53,16 +67,18 @@ const getTasks = async (req, res, next) => {
 const updateTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
 
     const task = await Task.findOneAndUpdate(
       { _id: id, createdBy: req.user._id },
-      updates,
-      { new: true }
+      req.body,
+      { new: true, runValidators: true }
     );
 
     if (!task) {
-      return res.status(404).json({ success: false, message: 'Task not found or unauthorized' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
     }
 
     res.json({ success: true, data: task });
@@ -76,9 +92,16 @@ const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findOneAndDelete({ _id: id, createdBy: req.user._id });
+    const task = await Task.findOneAndDelete({ 
+      _id: id, 
+      createdBy: req.user._id 
+    });
+
     if (!task) {
-      return res.status(404).json({ success: false, message: 'Task not found or unauthorized' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
     }
 
     res.json({ success: true, message: 'Task deleted successfully' });
