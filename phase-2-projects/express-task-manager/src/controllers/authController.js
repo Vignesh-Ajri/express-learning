@@ -145,11 +145,24 @@ const getProfile = async (req, res, next) => {
 
 // Logout user
 const logoutUser = (req, res) => {
-  res.clearCookie('token');
-  res.json({ 
-    success: true, 
-    message: 'Logged out successfully' 
-  });
+  try {
+    // Clear the HTTP-Only cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'Logged out successfully' 
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error logging out' 
+    });
+  }
 };
 
 module.exports = { registerUser, loginUser, getProfile, logoutUser };
