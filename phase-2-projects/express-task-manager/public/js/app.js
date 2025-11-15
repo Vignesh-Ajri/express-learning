@@ -1,21 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
   const API_BASE = 'http://localhost:5000';
 
-  // Helper function for API requests
+  // Helper function for API requests (Cookie-based)
   async function apiRequest(url, method = 'GET', data = null) {
     try {
-      const token = localStorage.getItem('token');
       const headers = {
         'Content-Type': 'application/json'
       };
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
       const options = {
         method,
-        headers
+        headers,
+        credentials: 'include' // Important: sends cookies automatically
       };
 
       if (data) {
@@ -26,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
 
       if (!response.ok) {
+        // If unauthorized, redirect to login
+        if (response.status === 401) {
+          window.location.href = '/login';
+          return null;
+        }
         throw new Error(result.message || 'Request failed');
       }
 
@@ -40,9 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Logout functionality
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
+    logoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      localStorage.removeItem('token');
+      
+      // Call logout API to clear cookie on server
+      await apiRequest('/api/auth/logout', 'POST');
+      
+      // Redirect to login
       window.location.href = '/login';
     });
   }
@@ -65,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await apiRequest('/api/auth/register', 'POST', { name, email, password });
       
       if (result && result.success) {
-        localStorage.setItem('token', result.data.token);
+        // Cookie is set automatically by server
         window.location.href = '/dashboard';
       }
     });
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await apiRequest('/api/auth/login', 'POST', { email, password });
       
       if (result && result.success) {
-        localStorage.setItem('token', result.data.token);
+        // Cookie is set automatically by server
         window.location.href = '/dashboard';
       }
     });
@@ -126,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadCategories() {
       const result = await apiRequest('/api/categories');
       if (result && result.success) {
-        categoryDropdown.innerHTML = 'No Category';
+        categoryDropdown.innerHTML = '<option value="">No Category</option>';
         result.data.forEach(cat => {
           const option = document.createElement('option');
           option.value = cat._id;
@@ -143,13 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
         result.data.forEach(task => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            ${task.title}
-            ${task.status}
-            ${task.category ? task.category.name : 'N/A'}
-            
-              ✓ Complete
-              🗑 Delete
-            
+            <td>${task.title}</td>
+            <td><span style="color: ${task.status === 'completed' ? 'green' : 'orange'}">${task.status}</span></td>
+            <td>${task.category ? task.category.name : 'N/A'}</td>
+            <td>
+              <button class="complete-btn" data-id="${task._id}">✓ Complete</button>
+              <button class="delete-btn" data-id="${task._id}">🗑 Delete</button>
+            </td>
           `;
           taskList.appendChild(row);
         });
@@ -210,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const li = document.createElement('li');
           li.innerHTML = `
             ${cat.name}
-            ✕ Delete
+            <button class="delete-cat" data-id="${cat._id}">✕ Delete</button>
           `;
           categoryList.appendChild(li);
         });
