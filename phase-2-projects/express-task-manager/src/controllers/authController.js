@@ -34,6 +34,14 @@ const registerUser = async (req, res, next) => {
     // Generate token
     const token = generateToken({ id: user._id });
 
+    // Set HTTP-Only Cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     // Return response
     res.status(201).json({ 
       success: true, 
@@ -43,7 +51,7 @@ const registerUser = async (req, res, next) => {
           name: user.name,
           email: user.email
         },
-        token 
+        token // Still send in response for backward compatibility
       } 
     });
   } catch (err) {
@@ -86,6 +94,14 @@ const loginUser = async (req, res, next) => {
     // Generate token
     const token = generateToken({ id: user._id });
 
+    // Set HTTP-Only Cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     res.json({ 
       success: true, 
       data: { 
@@ -94,7 +110,7 @@ const loginUser = async (req, res, next) => {
           name: user.name,
           email: user.email
         },
-        token 
+        token // Still send in response for backward compatibility
       } 
     });
   } catch (err) {
@@ -127,4 +143,13 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getProfile };
+// Logout user
+const logoutUser = (req, res) => {
+  res.clearCookie('token');
+  res.json({ 
+    success: true, 
+    message: 'Logged out successfully' 
+  });
+};
+
+module.exports = { registerUser, loginUser, getProfile, logoutUser };
